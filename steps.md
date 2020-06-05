@@ -2087,7 +2087,7 @@ cbsecurity = {
 	"handlerAnnotationSecurity"		: true,
 	// Activate security rule visualizer, defaults to false by default
 	"enableSecurityVisualizer"		: true
-};
+}
 ```
 
 Reinit the framework
