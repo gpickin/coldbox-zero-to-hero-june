@@ -1651,7 +1651,7 @@ component extends="tests.resources.BaseIntegrationSpec"{
 
 			it( "can stop a rant from being created from an invalid user", function(){
 				expect( function(){
-					var event = post( route="rants.create", params={
+					var event = post( route="rants", params={
 						body = "Test Rant"
 					} );
 				}).toThrow( type="NoUserLoggedIn" );
@@ -1662,7 +1662,7 @@ component extends="tests.resources.BaseIntegrationSpec"{
 				// Log in user
 				auth.authenticate( "testuser", "password" );
 
-				var event = post( route="rants.create", params={
+				var event = post( route="rants", params={
 					body = "Test Rant"
 				} );
 
@@ -1990,7 +1990,7 @@ Reinit the framework, then you'll see the Rant index.
 <cfoutput>
     <div class="card">
         <h4 class="card-header">Start a Rant</h4>
-        <form class="form panel card-body" method="POST" action="#event.buildLink( "rants.create" )#">
+        <form class="form panel card-body" method="POST" action="#event.buildLink( "rants" )#">
             <div class="form-group">
                 <textarea name="body" class="form-control" placeholder="What's on your mind?" rows="10"></textarea>
             </div>
@@ -2039,3 +2039,63 @@ Reinit the framework, then you'll see the Rant index.
 Hit http://127.0.0.1:42518/ and click on Start a rant and you'll see the form.
 Log out and try, and you can still see the form. Try to create a rant and you'll see an error!
 We need to secure the form, to ensure the user is logged in before they can send a rant.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 11 - Securing our App
+
+Configure `cbsecurity`, add the settings in your `ColdBox.cfc` under the `moduleSettings`. You can find the keys here: https://forgebox.io/view/cbSecurity
+
+```js
+cbsecurity = {
+	// The global invalid authentication event or URI or URL to go if an invalid authentication occurs
+	"invalidAuthenticationEvent"	: "login",
+	// Default Auhtentication Action: override or redirect when a user has not logged in
+	"defaultAuthenticationAction"	: "redirect",
+	// The global invalid authorization event or URI or URL to go if an invalid authorization occurs
+	"invalidAuthorizationEvent"		: "login",
+	// Default Authorization Action: override or redirect when a user does not have enough permissions to access something
+	"defaultAuthorizationAction"	: "redirect",
+	// You can define your security rules here or externally via a source
+	"rules"							: [
+        {
+            "whitelist": "",
+            "securelist": "rants/new",
+            "match": "url"
+        }
+    ],
+	// The validator is an object that will validate rules and annotations and provide feedback on either authentication or authorization issues.
+	"validator"						: "CBAuthValidator@cbsecurity",
+	// The WireBox ID of the authentication service to use in cbSecurity which must adhere to the cbsecurity.interfaces.IAuthService interface.
+	"authenticationService"  		: "authenticationService@cbauth",
+	// WireBox ID of the user service to use
+	"userService"             		: "UserService",
+	// Activate handler/action based annotation security
+	"handlerAnnotationSecurity"		: true,
+	// Activate security rule visualizer, defaults to false by default
+	"enableSecurityVisualizer"		: true
+};
+```
+
+Reinit the framework
+
+`coldbox reinit`
+
+Check out the security visualizer: http://127.0.0.1:42518/cbsecurity
+
+Now, hit the page while logged out. if you hit `start a rant` link, you should redirect to the login page
+
+Now log in and make sure you see the rant page.
